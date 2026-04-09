@@ -1,0 +1,9 @@
+encode_settings:
+  input_filepath: "data/raw/music/music_orchestra.wav"
+  output_dir: "data/encode"
+  bitrates:
+    - "32k"
+    - "64k"
+    - "128k"
+    - "320k"
+  format: "mp3"
