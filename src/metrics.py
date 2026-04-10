@@ -2,6 +2,7 @@ import numpy as np
 import os
 from scipy.signal import correlate
 from pystoi import stoi   
+import librosa
 
 # align
 def align_signals(x, y):
@@ -27,3 +28,19 @@ def bitrate(file_path, signal, sr):
 def perceptual_score(x, y, sr):
     x, y = align_signals(x, y)
     return stoi(x, y, sr)
+
+if __name__ == "__main__":
+    original_path = "../data/raw/speech/speech_male.wav"
+    encoded_path  = "../data/encode/speech_male_64k.mp3"
+
+    x, sr = librosa.load(original_path, sr=16000)
+    y, _ = librosa.load(encoded_path, sr=16000)
+
+    snr = snr_db(x, y)
+    br = bitrate(encoded_path, y, sr)
+    stoi_score = perceptual_score(x, y, sr)
+
+    print("RESULT")
+    print(f"SNR (dB): {snr:.2f}")
+    print(f"Bitrate (bps): {br:.2f}")
+    print(f"STOI: {stoi_score:.4f}")
