@@ -1,9 +1,0 @@
-encode_settings:
-  input_filepath: "data/raw/speech/speech_male.wav"
-  output_dir: "data/encode"
-  bitrates:
-    - "32k"
-    - "64k"
-    - "128k"
-    - "320k"
-  format: "mp3"
