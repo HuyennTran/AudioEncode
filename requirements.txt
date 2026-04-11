@@ -1,0 +1,8 @@
+streamlit
+PyYAML
+pydub
+numpy
+scipy
+pystoi
+librosa
+matplotlib
