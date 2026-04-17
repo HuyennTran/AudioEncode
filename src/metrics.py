@@ -67,8 +67,8 @@ def calculate_metrics(original_path, compressed_path, mode="speech"):
         "compression_ratio": cr_val
     }
 if __name__ == "__main__":
-    original_path = "data/raw/music/music_trumpet.wav"
-    encoded_path  = "data/encode/music_trumpet_64k.mp3"
+    original_path = "data/raw/music/music_orchestra.wav"
+    encoded_path  = "data/encode/music_orchestra_64k.mp3"
     # Mode selection
     mode = "music" 
     print("Processing audio... please wait.")
