@@ -13,9 +13,7 @@ from src.visualization import plot_spectrogram_comparison, plot_waveform_compari
 # Set up the main Streamlit page configuration
 st.set_page_config(page_title="Audio Codec Analyzer", layout="wide")
 
-st.title("🎵 Audio Encoding & Quality Evaluation Dashboard")
-st.markdown("Project: Audio Encoding Performance Evaluation")
-
+st.title("🎵 Project [25201] Evaluating Perceptual Audio Encoding Performance")
 # 1. GLOBAL SETTINGS: Users manually choose the mode here
 st.sidebar.header("1. Settings")
 audio_mode = st.sidebar.selectbox(
@@ -116,10 +114,10 @@ if st.sidebar.button("Run Analysis"):
                 m3.metric("Bitrate (kbps)", f"{metrics['bitrate']/1000:.1f}")
 
                 m4, m5, _ = st.columns(3)
-                m4.metric("Compression Ratio", f"{metrics['compression_ratio']:.1f}")
+                m4.metric("Compression Ratio", f"{metrics['compression_ratio']:.3f}")
                 
                 # Added Latency metric
-                m5.metric("Latency (s)", f"{processing_latency:.4f}")
+                m5.metric("Latency (s)", f"{processing_latency:.3f}")
                 
             with col2:
                 st.subheader("🎧 Audio Comparison")
