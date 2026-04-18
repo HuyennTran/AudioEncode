@@ -1,4 +1,4 @@
-# 🎵 AudioEncode: Audio Compression & Quality Evaluation Dashboard
+# 🎵 Project [25201] Evaluating Perceptual Audio Encoding Performance
 
 AudioEncode is an interactive tool developed in Python and Streamlit designed to evaluate the performance of audio compression algorithms. The system analyzes the trade-off between compression efficiency and signal quality using quantitative metrics and spectral analysis.
 
