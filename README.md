@@ -50,6 +50,7 @@ Before running the application, you need `.wav` files in the `data/raw/` directo
 Run the provided script to automatically fetch built-in sample `.wav` files directly into your workspace:
 ```bash
 python Download_data.py
+```
 
 **Method 2: Manual Download**
 You can manually download standard `.wav` audio samples from the following open-source repositories and place them into the `data/raw/` folder:
