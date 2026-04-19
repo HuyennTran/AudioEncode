@@ -110,7 +110,6 @@ The system provides:
 
 ## Notes
 
-* Audio is resampled to **16 kHz** for evaluation.
 * Input format should be `.wav` for original signals.
 * FFmpeg must be installed for encoding to work properly.
 
