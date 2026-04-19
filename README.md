@@ -16,7 +16,7 @@ AudioEncode is an interactive tool developed in Python and Streamlit designed to
 * **Perceptual Evaluation:**
   * **STOI (Short-Time Objective Intelligibility):** Optimized for speech signals.
   * **Spectral Cosine Similarity:** Computed on STFT magnitude for music signals.
-* **Visualization:** Side-by-side comparison of Waveforms and Spectrograms.
+* **Visualization:** Comparison of Waveforms and Spectrograms.
 
 ---
 
@@ -24,20 +24,27 @@ AudioEncode is an interactive tool developed in Python and Streamlit designed to
 
 ```text
 ├── app.py
-├── config/
-├── data/
-│   ├── raw/
-│   ├── encode/
-├── results/
-│   ├── spectrogram/
-│   └── waveform/
-├── src/
-│   ├── encoder.py
-│   ├── metrics.py
-│   └── visualization.py
-├── requirements.txt
+├── config
+│   ├── music_orchestra.yaml
+│   └── speech_male.yaml
+├── data
+│   ├── Download_data.py
+│   ├── encode
+│   └── raw
+│       ├── music
+│       ├── speech
+│       └── uploads
 ├── packages.txt
-└── README.md
+├── README.md
+├── requirements.txt
+├── results
+│   ├── spectrogram
+│   └── waveform
+└── src
+    ├── encoder.py
+    ├── __init__.py
+    ├── metrics.py
+    └── visualization.py
 ```
 
 ---
