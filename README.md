@@ -42,6 +42,21 @@ AudioEncode is an interactive tool developed in Python and Streamlit designed to
 
 ---
 
+## 📥 Data Acquisition
+
+Before running the application, you need `.wav` files in the `data/raw/` directory. You can obtain these audio samples using one of the following methods:
+
+**Method 1: Automated Download**
+Run the provided script to automatically fetch built-in sample `.wav` files directly into your workspace:
+```bash
+python Download_data.py
+
+**Method 2: Manual Download**
+You can manually download standard `.wav` audio samples from the following open-source repositories and place them into the `data/raw/` folder:
+* [SampleLib - Free WAV Audio Samples](https://samplelib.com/sample-wav.html)
+* [File Examples - Sample Audio Files](https://file-examples.com/index.php/sample-audio-files/sample-wav-download/)
+
+---
 ## Installation & Setup
 
 ```bash
