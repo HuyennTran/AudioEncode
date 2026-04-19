@@ -42,17 +42,24 @@ def calculate_bitrate(file_path, duration):
 # PERCEPTUAL QUALITY SCORE
 def calculate_perceptual_score(x, y, sr, mode):
     if mode == "speech":
-        return stoi(x, y, sr, extended=False)
+        # STOI strictly requires a sampling rate of 10kHz or 16kHz. 
+        # If the original sr (e.g., 44100) is not 16000, we TEMPORARILY resample it just for this calculation.
+        if sr != 16000:
+            x_stoi = librosa.resample(x, orig_sr=sr, target_sr=16000)
+            y_stoi = librosa.resample(y, orig_sr=sr, target_sr=16000)
+            return stoi(x_stoi, y_stoi, 16000, extended=False)
+        else:
+            return stoi(x, y, sr, extended=False)
     else:
-        # Convert to frequency domain using STFT
+        # For music, keep the highest quality (original sample rate) so STFT can analyze the high-frequency (treble) range.
         X = np.abs(librosa.stft(x))
         Y = np.abs(librosa.stft(y))
         num = np.sum(X * Y)
         de = np.sqrt(np.sum(X**2)) * np.sqrt(np.sum(Y**2)) + a
-        return num / de # Cosine similarity in STFT
+        return num / de
 def calculate_metrics(original_path, compressed_path, mode="speech"):
-    x, sr = librosa.load(original_path, sr=16000)
-    y, _ = librosa.load(compressed_path, sr=16000)
+    x, sr = librosa.load(original_path, sr=None)
+    y, _ = librosa.load(compressed_path, sr=sr)
     x_aligned, y_aligned = align_signals(x, y)
     duration = len(y_aligned) / sr
     snr_val = calculate_snr(x_aligned, y_aligned)
@@ -74,8 +81,8 @@ if __name__ == "__main__":
     print("Processing audio... please wait.")
 
     #Load the original file
-    x, sr = librosa.load(original_path, sr=16000)
-    y, _ = librosa.load(encoded_path, sr=16000)
+    x, sr = librosa.load(original_path, sr=None)
+    y, _ = librosa.load(encoded_path, sr=sr)
 
     # Align signals once 
     x_aligned, y_aligned = align_signals(x, y)

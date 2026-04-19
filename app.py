@@ -105,7 +105,7 @@ if st.sidebar.button("Run Analysis"):
                 
                 # Display 5 metrics including the new Latency
                 m1, m2, m3 = st.columns(3)
-                m1.metric("SNR (dB)", f"{metrics['snr']:.2f}")
+                m1.metric("SNR (dB)", f"{metrics['snr']:.3f}")
                 
                 # Dynamic labeling based on selected mode
                 score_label = "STOI Score" if audio_mode == "speech" else "Cosine Sim."
