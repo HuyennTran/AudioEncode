@@ -45,6 +45,7 @@ AudioEncode is an interactive tool developed in Python and Streamlit designed to
     ├── __init__.py
     ├── metrics.py
     └── visualization.py
+├── sample_upload
 ```
 
 ---
@@ -63,7 +64,7 @@ python data/Download_data.py
 You can manually download standard `.wav` audio samples from the following open-source repositories and place them into the `data/raw/` folder:
 * [SampleLib - Free WAV Audio Samples](https://samplelib.com/sample-wav.html)
 * [File Examples - Sample Audio Files](https://file-examples.com/index.php/sample-audio-files/sample-wav-download/)
-
+* [BartMassey Repo](https://github.com/pdx-cs-sound/wavs)
 ---
 ## Installation & Setup
 
