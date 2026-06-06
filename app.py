@@ -36,7 +36,7 @@ os.makedirs(output_dir, exist_ok=True)
 os.makedirs(img_dir, exist_ok=True)
 os.makedirs(raw_dir, exist_ok=True)
 
-original_file = None
+original_files = []
 
 if input_option == "Use Sample File":
     # Directory path depends on the manually selected global mode
@@ -45,8 +45,13 @@ if input_option == "Use Sample File":
     if os.path.exists(folder_path):
         available_files = [f for f in os.listdir(folder_path) if f.endswith('.wav')]
         if available_files:
-            selected_filename = st.sidebar.selectbox(f"Select {audio_mode.capitalize()} sample:", available_files)
-            original_file = os.path.join(folder_path, selected_filename)
+            selected_filenames = st.sidebar.multiselect(
+                f"Select {audio_mode.capitalize()} samples (up to 3):",
+                available_files,
+                max_selections=3,
+                help="Hold Ctrl/Cmd to select multiple files"
+            )
+            original_files = [os.path.join(folder_path, f) for f in selected_filenames]
         else:
             st.sidebar.error(f"No .wav files found in '{folder_path}'.")
             st.stop()
@@ -54,15 +59,27 @@ if input_option == "Use Sample File":
         st.sidebar.error(f"Directory not found: {folder_path}")
         st.stop()
 else:
-    # Logic for custom user uploads
-    uploaded_file = st.sidebar.file_uploader("Upload WAV file", type=["wav"])
-    if uploaded_file is not None:
-        original_file = os.path.join(raw_dir, uploaded_file.name)
-        with open(original_file, "wb") as f:
-            f.write(uploaded_file.getbuffer())
+    # Logic for custom user uploads (multiple files)
+    uploaded_file_list = st.sidebar.file_uploader(
+        "Upload WAV files (up to 3)",
+        type=["wav"],
+        accept_multiple_files=True,
+        help="Select up to 3 .wav files at once"
+    )
+    if uploaded_file_list:
+        # Limit to 3 files
+        for uf in uploaded_file_list[:3]:
+            save_path = os.path.join(raw_dir, uf.name)
+            with open(save_path, "wb") as f:
+                f.write(uf.getbuffer())
+            original_files.append(save_path)
     else:
-        st.info("Please upload a .wav file from the sidebar to start.")
+        st.info("Please upload one or more .wav files from the sidebar to start.")
         st.stop()
+
+if not original_files:
+    st.info("Please select at least one audio file from the sidebar to start.")
+    st.stop()
 
 # 3. ENCODING CONFIGURATION
 st.sidebar.header("3. Encoding Settings")
@@ -74,69 +91,70 @@ target_bitrate = st.sidebar.select_slider(
 
 # EXECUTION BLOCK
 if st.sidebar.button("Run Analysis"):
-    if original_file:
-        with st.spinner(f"Processing {audio_mode} audio..."):
-            
-            # Start timer to calculate latency
-            start_time = time.time()
-            
-            # Execute audio compression via FFmpeg
-            results_dict = encode_audio(
-                input_filepath=original_file,
-                output_dir=output_dir,
-                bitrates=[target_bitrate],   
-                fmt="mp3"
-            )
-            
-            # End timer and calculate total processing latency
-            processing_latency = time.time() - start_time
-            
-            comp_file = results_dict[target_bitrate]
-            
-            # Calculate quality metrics using the user-selected mode
-            metrics = calculate_metrics(original_file, comp_file, mode=audio_mode)
-            
-            # Layout for numerical results and players
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                st.subheader("Evaluation Metrics")
-                st.info(f"Active analysis mode: **{audio_mode.upper()}**")
-                
-                # Display 5 metrics including the new Latency
-                m1, m2, m3 = st.columns(3)
-                m1.metric("SNR (dB)", f"{metrics['snr']:.3f}")
-                
-                # Dynamic labeling based on selected mode
-                score_label = "STOI Score" if audio_mode == "speech" else "Cosine Sim."
-                m2.metric(score_label, f"{metrics['perceptual_score']:.3f}")
-                
-                m3.metric("Bitrate (kbps)", f"{metrics['bitrate']/1000:.1f}")
+    # Create one tab per selected file
+    file_tab_labels = [os.path.basename(f) for f in original_files]
+    file_tabs = st.tabs(file_tab_labels)
 
-                m4, m5, _ = st.columns(3)
-                m4.metric("Compression Ratio", f"{metrics['compression_ratio']:.3f}")
-                
-                # Added Latency metric
-                m5.metric("Latency (s)", f"{processing_latency:.3f}")
-                
-            with col2:
-                st.subheader("🎧 Audio Comparison")
-                st.write("Original Source:")
-                st.audio(original_file)
-                st.write(f"Encoded Output ({target_bitrate}):")
-                st.audio(comp_file)
+    for i, original_file in enumerate(original_files):
+        with file_tabs[i]:
+            with st.spinner(f"Processing {os.path.basename(original_file)} ({audio_mode} mode)..."):
 
-        # Visualizations
-        st.subheader("Visual Analysis")
-        tab1, tab2 = st.tabs(["Spectrogram Comparison", "Waveform Comparison"])
-        
-        with tab1:
-            spec_path = plot_spectrogram_comparison(original_file, comp_file, os.path.join(img_dir, "spectrogram"))
-            st.image(spec_path, use_container_width=True)
-        with tab2:
-            wave_path = plot_waveform_comparison(original_file, comp_file, os.path.join(img_dir, "waveform"))
-            st.image(wave_path, use_container_width=True)
-    else:
-        st.error("No valid audio file selected.")
+                # Start timer to calculate latency
+                start_time = time.time()
+
+                # Execute audio compression via FFmpeg
+                results_dict = encode_audio(
+                    input_filepath=original_file,
+                    output_dir=output_dir,
+                    bitrates=[target_bitrate],
+                    fmt="mp3"
+                )
+
+                # End timer and calculate total processing latency
+                processing_latency = time.time() - start_time
+
+                comp_file = results_dict[target_bitrate]
+
+                # Calculate quality metrics using the user-selected mode
+                metrics = calculate_metrics(original_file, comp_file, mode=audio_mode)
+
+                # Layout for numerical results and players
+                col1, col2 = st.columns(2)
+
+                with col1:
+                    st.subheader("Evaluation Metrics")
+                    st.info(f"Active analysis mode: **{audio_mode.upper()}**")
+
+                    # Display 5 metrics including Latency
+                    m1, m2, m3 = st.columns(3)
+                    m1.metric("SNR (dB)", f"{metrics['snr']:.3f}")
+
+                    # Dynamic labeling based on selected mode
+                    score_label = "STOI Score" if audio_mode == "speech" else "Cosine Sim."
+                    m2.metric(score_label, f"{metrics['perceptual_score']:.3f}")
+
+                    m3.metric("Bitrate (kbps)", f"{metrics['bitrate']/1000:.1f}")
+
+                    m4, m5, _ = st.columns(3)
+                    m4.metric("Compression Ratio", f"{metrics['compression_ratio']:.3f}")
+                    m5.metric("Latency (s)", f"{processing_latency:.3f}")
+
+                with col2:
+                    st.subheader("🎧 Audio Comparison")
+                    st.write("Original Source:")
+                    st.audio(original_file)
+                    st.write(f"Encoded Output ({target_bitrate}):")
+                    st.audio(comp_file)
+
+            # Visualizations
+            st.subheader("Visual Analysis")
+            vtab1, vtab2 = st.tabs(["Spectrogram Comparison", "Waveform Comparison"])
+
+            with vtab1:
+                spec_path = plot_spectrogram_comparison(original_file, comp_file, os.path.join(img_dir, "spectrogram"))
+                st.image(spec_path, use_container_width=True)
+            with vtab2:
+                wave_path = plot_waveform_comparison(original_file, comp_file, os.path.join(img_dir, "waveform"))
+                st.image(wave_path, use_container_width=True)
 else:
     st.info("Configure parameters in the sidebar and click 'Run Analysis' to begin.")
