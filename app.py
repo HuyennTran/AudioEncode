@@ -46,7 +46,7 @@ if input_option == "Use Sample File":
         available_files = [f for f in os.listdir(folder_path) if f.endswith('.wav')]
         if available_files:
             selected_filenames = st.sidebar.multiselect(
-                f"Select {audio_mode.capitalize()} samples (up to 3):",
+                f"Select {audio_mode.capitalize()} samples:",
                 available_files,
                 max_selections=3,
                 help="Hold Ctrl/Cmd to select multiple files"
